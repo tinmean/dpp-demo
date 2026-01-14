@@ -1,0 +1,290 @@
+import React, { useState, useEffect } from 'react';
+import { QrCode, Globe, Recycle, Info, CheckCircle, MapPin, Package, ArrowRight, X } from 'lucide-react';
+
+// --- 模擬產品資料庫 (真實情況下這些資料可能來自 API 或外部 JSON) ---
+const PRODUCT_DATABASE = {
+  // 範例 GTIN 1: 環保運動鞋
+  "09876543210123": {
+    name: "EcoStep Pro 跑鞋",
+    brand: "GreenWalk",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+    description: "由 100% 海洋回收塑料製成的高性能跑鞋。",
+    specs: {
+      color: "海洋藍",
+      size: "US 10",
+      batch: "2024-Q1-TW"
+    },
+    traceability: [
+      { step: "原料採集", location: "台灣, 澎湖", date: "2023-10-01", icon: Recycle },
+      { step: "紡織加工", location: "台灣, 彰化", date: "2023-11-15", icon: Package },
+      { step: "最終組裝", location: "越南, 胡志明", date: "2024-01-20", icon: CheckCircle },
+    ],
+    materials: [
+      { name: "回收 PET", percentage: 80 },
+      { name: "天然橡膠", percentage: 20 }
+    ],
+    disposal: "可透過品牌門市回收計畫進行回收。"
+  },
+  // 範例 GTIN 2: 有機棉 T-shirt
+  "09876543210456": {
+    name: "PureCotton 經典 T-shirt",
+    brand: "GreenWalk",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
+    description: "無毒、無農藥的有機棉，對肌膚最溫柔的呵護。",
+    specs: {
+      color: "米白",
+      size: "L",
+      batch: "2024-JAN-Batch"
+    },
+    traceability: [
+      { step: "棉花種植", location: "土耳其, 伊茲密爾", date: "2023-08-01", icon: MapPin },
+      { step: "紡紗織布", location: "葡萄牙, 波爾圖", date: "2023-09-20", icon: Package },
+      { step: "品檢包裝", location: "德國, 漢堡", date: "2023-10-10", icon: CheckCircle },
+    ],
+    materials: [
+      { name: "有機棉", percentage: 100 }
+    ],
+    disposal: "可自然生物降解，或投入衣物回收箱。"
+  }
+};
+
+// --- 組件: 護照首頁 (如果沒有掃描到特定產品) ---
+const LandingPage = ({ onSimulateScan }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
+    <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+      <div className="flex justify-center mb-6">
+        <div className="bg-green-100 p-4 rounded-full">
+          <QrCode className="w-12 h-12 text-green-600" />
+        </div>
+      </div>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">數位產品護照查驗</h1>
+      <p className="text-gray-500 mb-8">
+        請掃描產品上的 GS1 QR Code 以存取該產品的數位護照、履歷與回收資訊。
+      </p>
+      
+      <div className="border-t border-gray-100 pt-6">
+        <p className="text-sm text-gray-400 mb-4">-- 模擬測試區 (點擊下方連結) --</p>
+        <div className="space-y-3">
+          <button 
+            onClick={() => onSimulateScan('09876543210123')}
+            className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition flex items-center justify-between group"
+          >
+            <span className="font-mono text-sm">GTIN: ...0123 (跑鞋)</span>
+            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
+          </button>
+          <button 
+            onClick={() => onSimulateScan('09876543210456')}
+            className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition flex items-center justify-between group"
+          >
+            <span className="font-mono text-sm">GTIN: ...0456 (T-shirt)</span>
+            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
+          </button>
+        </div>
+      </div>
+    </div>
+    <p className="mt-8 text-xs text-gray-400">Powered by Gandi & GitHub Pages</p>
+  </div>
+);
+
+// --- 組件: 產品護照詳情頁 ---
+const PassportPage = ({ product, gtin, onBack }) => {
+  const [activeTab, setActiveTab] = useState('traceability');
+
+  if (!product) return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 p-6">
+      <div className="bg-white p-6 rounded-xl shadow-lg text-center max-w-sm">
+        <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-gray-800">找不到產品</h2>
+        <p className="text-gray-600 mt-2">系統無法識別 GTIN: {gtin}</p>
+        <button onClick={onBack} className="mt-6 px-6 py-2 bg-gray-800 text-white rounded-lg">返回</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-12">
+      {/* Header Image */}
+      <div className="relative h-64 w-full bg-gray-200">
+        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+        <button 
+          onClick={onBack}
+          className="absolute top-4 left-4 bg-white/80 backdrop-blur p-2 rounded-full shadow-sm hover:bg-white"
+        >
+          <ArrowRight className="w-5 h-5 rotate-180" />
+        </button>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 pt-20">
+          <span className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded mb-2 inline-block">VERIFIED</span>
+          <h1 className="text-2xl font-bold text-white leading-tight">{product.name}</h1>
+          <p className="text-white/80 text-sm">{product.brand}</p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="px-4 -mt-6 relative z-10">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          
+          {/* Tabs */}
+          <div className="flex border-b border-gray-100">
+            <button 
+              onClick={() => setActiveTab('traceability')}
+              className={`flex-1 py-4 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'traceability' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}
+            >
+              <Globe className="w-4 h-4" /> 旅程
+            </button>
+            <button 
+              onClick={() => setActiveTab('materials')}
+              className={`flex-1 py-4 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'materials' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}
+            >
+              <Recycle className="w-4 h-4" /> 材質
+            </button>
+            <button 
+              onClick={() => setActiveTab('info')}
+              className={`flex-1 py-4 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === 'info' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}
+            >
+              <Info className="w-4 h-4" /> 資訊
+            </button>
+          </div>
+
+          <div className="p-6">
+            {/* Tab: Traceability */}
+            {activeTab === 'traceability' && (
+              <div className="space-y-6">
+                <h3 className="font-bold text-gray-800">生產足跡</h3>
+                <div className="relative border-l-2 border-green-100 pl-6 space-y-8">
+                  {product.traceability.map((step, idx) => (
+                    <div key={idx} className="relative">
+                      <div className="absolute -left-[31px] bg-green-100 p-1.5 rounded-full border-2 border-white">
+                        <step.icon className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{step.step}</span>
+                        <p className="text-gray-800 font-medium mt-1">{step.location}</p>
+                        <p className="text-xs text-gray-400 mt-2">{step.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Materials */}
+            {activeTab === 'materials' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-bold text-gray-800 mb-4">材質組成</h3>
+                  <div className="space-y-4">
+                    {product.materials.map((mat, idx) => (
+                      <div key={idx}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-700">{mat.name}</span>
+                          <span className="font-bold text-gray-900">{mat.percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div 
+                            className="bg-green-500 h-2 rounded-full" 
+                            style={{ width: `${mat.percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="text-sm font-bold text-blue-800 mb-2 flex items-center gap-2">
+                    <Recycle className="w-4 h-4" /> 回收指示
+                  </h4>
+                  <p className="text-sm text-blue-700 leading-relaxed">
+                    {product.disposal}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Info */}
+            {activeTab === 'info' && (
+              <div className="space-y-4">
+                <h3 className="font-bold text-gray-800">產品規格</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <span className="text-xs text-gray-400 block">顏色</span>
+                    <span className="text-sm font-medium text-gray-800">{product.specs.color}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <span className="text-xs text-gray-400 block">尺寸</span>
+                    <span className="text-sm font-medium text-gray-800">{product.specs.size}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg col-span-2">
+                    <span className="text-xs text-gray-400 block">生產批號</span>
+                    <span className="text-sm font-medium font-mono text-gray-800">{product.specs.batch}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg col-span-2">
+                    <span className="text-xs text-gray-400 block">GTIN (全球識別碼)</span>
+                    <span className="text-sm font-medium font-mono text-gray-800">{gtin}</span>
+                  </div>
+                </div>
+                <div className="mt-6 text-center">
+                  <p className="text-xs text-gray-400">此數位護照由區塊鏈技術保護 (模擬)</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+export default function App() {
+  // 移除 currentPath state，因為在預覽環境中我們主要依賴 scannedGTIN 來切換畫面
+  const [scannedGTIN, setScannedGTIN] = useState(null);
+
+  // 模擬路由解析邏輯
+  const parsePath = (path) => {
+    // 簡單解析：檢查路徑是否包含我們的範例 GTIN
+    const parts = path.split('/');
+    const identifierIndex = parts.indexOf('01'); 
+    
+    if (identifierIndex !== -1 && parts[identifierIndex + 1]) {
+      return parts[identifierIndex + 1];
+    }
+    return null;
+  };
+
+  // 當使用者在 Landing Page 點擊模擬按鈕時
+  const handleSimulateScan = (gtin) => {
+    // 修正：在預覽環境中，我們不執行 window.history.pushState 來避免 SecurityError。
+    // 在真實的產品環境中（如 GitHub Pages），你可以保留 pushState 來改變網址。
+    // window.history.pushState({}, '', `/01/${gtin}`); 
+    setScannedGTIN(gtin);
+  };
+
+  const handleBack = () => {
+    // 修正：同樣移除 pushState 以相容預覽環境。
+    // window.history.pushState({}, '', '/');
+    setScannedGTIN(null);
+  };
+
+  // 初始化檢查
+  useEffect(() => {
+    // 嘗試從當前網址讀取（針對如果網址已經帶有參數的情況）
+    // 在預覽環境通常是 blob url，所以這段通常回傳 null，但保留邏輯無妨
+    try {
+        const gtin = parsePath(window.location.pathname);
+        if (gtin) {
+          setScannedGTIN(gtin);
+        }
+    } catch (e) {
+        console.log("Navigation parsing skipped in preview mode");
+    }
+  }, []);
+
+  // 根據狀態渲染不同頁面
+  if (scannedGTIN) {
+    const product = PRODUCT_DATABASE[scannedGTIN];
+    return <PassportPage product={product} gtin={scannedGTIN} onBack={handleBack} />;
+  }
+
+  return <LandingPage onSimulateScan={handleSimulateScan} />;
+}
