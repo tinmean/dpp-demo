@@ -40,6 +40,130 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
+        // --- 翻譯字典 ---
+        const TRANSLATIONS = {
+            zh: {
+                title: "產品數位護照",
+                subtitle: "請掃描產品上的 Digital Link QR Code 以查看產品履歷。",
+                formatTitle: "Digital Link 網址格式",
+                devLinks: "開發測試連結 (模擬掃描)",
+                poweredBy: "Powered by",
+                notFoundTitle: "查無此產品",
+                notFoundDesc: "系統資料庫中找不到 GTIN 編號：",
+                backHome: "返回首頁",
+                verifiedPassport: "已驗證護照",
+                tabTraceability: "旅程",
+                tabMaterials: "材質",
+                tabInfo: "資訊",
+                footprintTitle: "產品足跡",
+                footprintBadge: "全供應鏈追溯",
+                materialComp: "材質組成",
+                recyclingInst: "回收指示",
+                specsTitle: "產品規格",
+                gtinLabel: "GTIN (全球識別碼)",
+                verifyBtn: "驗證區塊鏈證書 (Verifiable Credential)",
+                verifyHint: "點擊上方按鈕以執行 W3C 標準 DID 驗證",
+                vcTitle: "可驗證數位憑證",
+                vcSubtitle: "Verifiable Credential (W3C Standard)",
+                tabView: "憑證檢視",
+                tabJson: "原始資料 (JSON-LD)",
+                issuer: "發證者 (Issuer)",
+                subject: "憑證持有者 (Subject)",
+                date: "頒發日期",
+                grsTitle: "GRS 認證摘要",
+                grsStandard: "標準",
+                grsRatio: "再生比例",
+                grsCertNo: "證書編號",
+                cprTitle: "歐盟 CPR 宣告",
+                cprDop: "DoP 編號",
+                cprFire: "防火等級",
+                btnVerify: "驗證數位簽章",
+                statusVerifying: "正在與去中心化網絡通訊中...",
+                statusSuccess: "驗證成功",
+                statusSuccessDesc: "此產品護照資料真實且未被篡改。",
+                statusSuccessDetail: "DID 解析正確 • 簽章有效 • 證書未撤銷",
+                logInit: "初始化 VC 驗證程序...",
+                logResolve: "正在解析發證者 DID: ",
+                logDidFetched: "DID 文件讀取成功",
+                logKeyFound: "找到公開金鑰: key-1 (Ed25519)",
+                logVerifySig: "正在驗證 JWS 數位簽章...",
+                logSigValid: "簽章驗證通過。資料完整性確認。",
+                logCheckRevoke: "檢查撤銷狀態清單 (StatusList2021)...",
+                logActive: "憑證狀態：有效 (未撤銷)",
+                logGrsCheck: "驗證 GRS 規範符合性...",
+                logGrsValid: "Schema: GRS 4.0 已驗證",
+                logComplete: "驗證流程結束。",
+                specKeys: {
+                    color: "顏色/外觀",
+                    size: "尺寸/規格",
+                    batch: "生產批號",
+                    fireRating: "防火等級 (Euroclass)",
+                    nrc: "吸音性能 (NRC)",
+                    ceMark: "CE 認證標準"
+                }
+            },
+            en: {
+                title: "Digital Product Passport",
+                subtitle: "Please scan the Digital Link QR Code on the product to view its passport.",
+                formatTitle: "Digital Link URL Format",
+                devLinks: "Dev Links (Simulate Scan)",
+                poweredBy: "Powered by",
+                notFoundTitle: "Product Not Found",
+                notFoundDesc: "GTIN not found in the system database:",
+                backHome: "Back to Home",
+                verifiedPassport: "Verified Passport",
+                tabTraceability: "Journey",
+                tabMaterials: "Materials",
+                tabInfo: "Info",
+                footprintTitle: "Product Footprint",
+                footprintBadge: "Full Traceability",
+                materialComp: "Material Composition",
+                recyclingInst: "Recycling Instructions",
+                specsTitle: "Product Specifications",
+                gtinLabel: "GTIN (Global Trade Item Number)",
+                verifyBtn: "Verify Blockchain Credential",
+                verifyHint: "Click above to perform W3C DID Verification",
+                vcTitle: "Verifiable Credential",
+                vcSubtitle: "W3C Standard",
+                tabView: "Credential View",
+                tabJson: "Raw Data (JSON-LD)",
+                issuer: "Issuer",
+                subject: "Subject",
+                date: "Issuance Date",
+                grsTitle: "GRS Summary",
+                grsStandard: "Standard",
+                grsRatio: "Recycled Content",
+                grsCertNo: "Cert No.",
+                cprTitle: "EU CPR Declaration",
+                cprDop: "DoP Number",
+                cprFire: "Fire Rating",
+                btnVerify: "Verify Digital Signature",
+                statusVerifying: "Communicating with decentralized network...",
+                statusSuccess: "Verification Successful",
+                statusSuccessDesc: "This passport data is authentic and tamper-proof.",
+                statusSuccessDetail: "DID Resolved • Signature Valid • Not Revoked",
+                logInit: "Initializing VC verification...",
+                logResolve: "Resolving Issuer DID: ",
+                logDidFetched: "DID Document fetched successfully",
+                logKeyFound: "Public Key found: key-1 (Ed25519)",
+                logVerifySig: "Verifying JWS Signature...",
+                logSigValid: "Signature valid. Integrity check passed.",
+                logCheckRevoke: "Checking Revocation Status (StatusList2021)...",
+                logActive: "Credential is ACTIVE (Not Revoked)",
+                logGrsCheck: "Validating GRS Schema Compliance...",
+                logGrsValid: "Schema: GRS 4.0 Verified",
+                logComplete: "Verification Process Complete.",
+                specKeys: {
+                    color: "Color",
+                    size: "Size",
+                    batch: "Batch No.",
+                    fireRating: "Fire Rating",
+                    nrc: "NRC",
+                    ceMark: "CE Standard"
+                }
+            }
+        };
+
         // --- Icon 組件 ---
         const IconBase = ({ children, className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
@@ -58,36 +182,36 @@
         const Lock = (p) => <IconBase {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></IconBase>;
         const Loader = (p) => <IconBase {...p} className={`${p.className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const Building = (p) => <IconBase {...p}><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></IconBase>;
-        const Terminal = (p) => <IconBase {...p}><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></IconBase>;
+        const Languages = (p) => <IconBase {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconBase>;
 
-        // --- 產品資料庫 ---
+
+        // --- 產品資料庫 (支援雙語結構) ---
         const PRODUCT_DATABASE = {
-            // 新增產品：符合歐盟營建法規 (CPR) 的再生建材
             "09876543210999": {
-                name: "EcoSound 再生吸音板",
-                brand: "BuildGreen EU",
-                // 營建材料圖片
+                name: { zh: "EcoSound 再生吸音板", en: "EcoSound Recycled Acoustic Panel" },
+                brand: { zh: "BuildGreen EU", en: "BuildGreen EU" },
                 image: "https://images.unsplash.com/photo-1629196911514-cfd8d63f6635?auto=format&fit=crop&w=600&q=80",
-                description: "高性能聲學吸音板，由 100% GRS 認證的再生 PET 纖維製成，符合歐盟建築法規 (CPR)。",
+                description: {
+                    zh: "高性能聲學吸音板，由 100% GRS 認證的再生 PET 纖維製成，符合歐盟建築法規 (CPR)。",
+                    en: "High-performance acoustic panel made from 100% GRS certified recycled PET fibers, compliant with EU CPR."
+                },
                 specs: { 
-                    color: "石墨灰", 
-                    size: "1200x600x50mm", 
-                    batch: "EU-2024-C99",
-                    // 營建產品關鍵屬性
-                    fireRating: "Euroclass B-s1, d0", // 防火等級
-                    nrc: "0.85 (吸音係數)",
-                    ceMark: "Yes (EN 15102)" // CE 標誌
+                    color: { zh: "石墨灰", en: "Graphite Grey" },
+                    size: { zh: "1200x600x50mm", en: "1200x600x50mm" },
+                    batch: { zh: "EU-2024-C99", en: "EU-2024-C99" },
+                    fireRating: { zh: "Euroclass B-s1, d0", en: "Euroclass B-s1, d0" },
+                    nrc: { zh: "0.85 (吸音係數)", en: "0.85 (NRC)" },
+                    ceMark: { zh: "Yes (EN 15102)", en: "Yes (EN 15102)" }
                 },
                 traceability: [
-                    { step: "PET 瓶磚回收", location: "德國, 柏林", date: "2023-11-05", icon: Recycle },
-                    { step: "纖維抽絲加工", location: "波蘭, 羅茲", date: "2023-11-20", icon: Package },
-                    { step: "熱壓成型與裁切", location: "捷克, 布拉格", date: "2023-12-01", icon: Building },
+                    { step: { zh: "PET 瓶磚回收", en: "PET Bottle Bale Recycling" }, location: { zh: "德國, 柏林", en: "Berlin, Germany" }, date: "2023-11-05", icon: Recycle },
+                    { step: { zh: "纖維抽絲加工", en: "Fiber Extrusion" }, location: { zh: "波蘭, 羅茲", en: "Lodz, Poland" }, date: "2023-11-20", icon: Package },
+                    { step: { zh: "熱壓成型與裁切", en: "Thermoforming & Cutting" }, location: { zh: "捷克, 布拉格", en: "Prague, Czechia" }, date: "2023-12-01", icon: Building },
                 ],
                 materials: [
-                    { name: "rPET (再生聚酯纖維)", percentage: 100 },
+                    { name: { zh: "rPET (再生聚酯纖維)", en: "rPET (Recycled Polyester)" }, percentage: 100 },
                 ],
-                disposal: "可透過原廠回收計畫進行 100% 閉環回收。",
-                // GRS + VC 示範
+                disposal: { zh: "可透過原廠回收計畫進行 100% 閉環回收。", en: "100% closed-loop recyclable via manufacturer take-back program." },
                 verifiableCredential: {
                     "@context": ["https://www.w3.org/2018/credentials/v1", "https://schema.org/"],
                     "type": ["VerifiableCredential", "GRSCertificate", "ConstructionProductDeclaration"],
@@ -96,42 +220,42 @@
                     "credentialSubject": {
                         "id": "did:web:dpp-demo.sdpp.tw:product:09876543210999",
                         "gtin": "09876543210999",
-                        // GRS 認證內容
                         "grsCertification": {
                             "standard": "Global Recycled Standard (GRS) 4.0",
                             "scope": "Post-consumer Recycled Content",
                             "percentage": "100%",
                             "certificateNo": "CU-899123-2024"
                         },
-                        // 歐盟營建法規 (CPR) 宣告
                         "constructionDeclaration": {
                             "regulation": "EU Construction Products Regulation (CPR)",
-                            "dopNumber": "DoP-2024-001", // 性能宣告書編號
+                            "dopNumber": "DoP-2024-001",
                             "harmonizedStandard": "EN 15102:2007+A1:2011",
                             "fireClassification": "B-s1, d0"
                         }
                     },
-                    "proof": {
-                        "type": "JsonWebSignature2020",
-                        "created": "2024-01-15T09:00:00Z",
-                        "verificationMethod": "did:web:cert.controlunion.com#key-1",
-                        "jws": "eyJhbGciOiJFZERTQSIsIm..."
-                    }
+                    "proof": { "type": "JsonWebSignature2020", "jws": "eyJhbGciOiJFZERTQSIsIm..." }
                 }
             },
             "09876543210123": {
-                name: "EcoStep Pro 跑鞋",
-                brand: "GreenWalk",
+                name: { zh: "EcoStep Pro 跑鞋", en: "EcoStep Pro Running Shoes" },
+                brand: { zh: "GreenWalk", en: "GreenWalk" },
                 image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
-                description: "由 100% 海洋回收塑料製成的高性能跑鞋。",
-                specs: { color: "海洋藍", size: "US 10", batch: "2024-Q1-TW" },
+                description: { zh: "由 100% 海洋回收塑料製成的高性能跑鞋。", en: "High-performance running shoes made from 100% ocean recycled plastics." },
+                specs: { 
+                    color: { zh: "海洋藍", en: "Ocean Blue" }, 
+                    size: { zh: "US 10", en: "US 10" }, 
+                    batch: { zh: "2024-Q1-TW", en: "2024-Q1-TW" } 
+                },
                 traceability: [
-                    { step: "原料採集", location: "台灣, 澎湖", date: "2023-10-01", icon: Recycle },
-                    { step: "紡織加工", location: "台灣, 彰化", date: "2023-11-15", icon: Package },
-                    { step: "最終組裝", location: "越南, 胡志明", date: "2024-01-20", icon: CheckCircle },
+                    { step: { zh: "原料採集", en: "Material Collection" }, location: { zh: "台灣, 澎湖", en: "Penghu, Taiwan" }, date: "2023-10-01", icon: Recycle },
+                    { step: { zh: "紡織加工", en: "Textile Processing" }, location: { zh: "台灣, 彰化", en: "Changhua, Taiwan" }, date: "2023-11-15", icon: Package },
+                    { step: { zh: "最終組裝", en: "Final Assembly" }, location: { zh: "越南, 胡志明", en: "Ho Chi Minh City, Vietnam" }, date: "2024-01-20", icon: CheckCircle },
                 ],
-                materials: [{ name: "回收 PET", percentage: 80 }, { name: "天然橡膠", percentage: 20 }],
-                disposal: "可透過品牌門市回收計畫進行回收。",
+                materials: [
+                    { name: { zh: "回收 PET", en: "Recycled PET" }, percentage: 80 }, 
+                    { name: { zh: "天然橡膠", en: "Natural Rubber" }, percentage: 20 }
+                ],
+                disposal: { zh: "可透過品牌門市回收計畫進行回收。", en: "Recyclable through brand store take-back programs." },
                 verifiableCredential: {
                     "@context": ["https://www.w3.org/2018/credentials/v1"],
                     "type": ["VerifiableCredential", "SustainableProductClaim"],
@@ -140,32 +264,30 @@
                     "credentialSubject": {
                         "id": "did:web:dpp-demo.sdpp.tw:product:09876543210123",
                         "gtin": "09876543210123",
-                        "claim": {
-                            "recycledContent": "80%",
-                            "carbonNeutral": true
-                        }
+                        "claim": { "recycledContent": "80%", "carbonNeutral": true }
                     },
-                    "proof": {
-                        "type": "JsonWebSignature2020",
-                        "created": "2023-11-20T19:23:24Z",
-                        "verificationMethod": "did:web:issuer.greenwalk.com#key-1",
-                        "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..."
-                    }
+                    "proof": { "type": "JsonWebSignature2020", "jws": "eyJhbGciOiJFZERTQSIsImI2..." }
                 }
             },
             "09876543210456": {
-                name: "PureCotton 經典 T-shirt",
-                brand: "GreenWalk",
+                name: { zh: "PureCotton 經典 T-shirt", en: "PureCotton Classic T-shirt" },
+                brand: { zh: "GreenWalk", en: "GreenWalk" },
                 image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
-                description: "無毒、無農藥的有機棉，對肌膚最溫柔的呵護。",
-                specs: { color: "米白", size: "L", batch: "2024-JAN-Batch" },
+                description: { zh: "無毒、無農藥的有機棉，對肌膚最溫柔的呵護。", en: "Toxic-free, pesticide-free organic cotton, gentle on your skin." },
+                specs: { 
+                    color: { zh: "米白", en: "Off-White" }, 
+                    size: { zh: "L", en: "L" }, 
+                    batch: { zh: "2024-JAN-Batch", en: "2024-JAN-Batch" } 
+                },
                 traceability: [
-                    { step: "棉花種植", location: "土耳其, 伊茲密爾", date: "2023-08-01", icon: MapPin },
-                    { step: "紡紗織布", location: "葡萄牙, 波爾圖", date: "2023-09-20", icon: Package },
-                    { step: "品檢包裝", location: "德國, 漢堡", date: "2023-10-10", icon: CheckCircle },
+                    { step: { zh: "棉花種植", en: "Cotton Farming" }, location: { zh: "土耳其, 伊茲密爾", en: "Izmir, Turkey" }, date: "2023-08-01", icon: MapPin },
+                    { step: { zh: "紡紗織布", en: "Spinning & Weaving" }, location: { zh: "葡萄牙, 波爾圖", en: "Porto, Portugal" }, date: "2023-09-20", icon: Package },
+                    { step: { zh: "品檢包裝", en: "QC & Packaging" }, location: { zh: "德國, 漢堡", en: "Hamburg, Germany" }, date: "2023-10-10", icon: CheckCircle },
                 ],
-                materials: [{ name: "有機棉", percentage: 100 }],
-                disposal: "可自然生物降解，或投入衣物回收箱。",
+                materials: [
+                    { name: { zh: "有機棉", en: "Organic Cotton" }, percentage: 100 }
+                ],
+                disposal: { zh: "可自然生物降解，或投入衣物回收箱。", en: "Biodegradable or suitable for clothing recycling bins." },
                 verifiableCredential: {
                     "@context": ["https://www.w3.org/2018/credentials/v1"],
                     "type": ["VerifiableCredential", "OrganicCottonCert"],
@@ -180,12 +302,26 @@
             }
         };
 
+        // --- 組件: 語言切換器 ---
+        const LanguageSwitcher = ({ lang, setLang }) => (
+            <button 
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                className="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur border border-gray-200 shadow-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold hover:bg-gray-50 transition"
+            >
+                <Languages className="w-3.5 h-3.5" />
+                <span className={lang === 'zh' ? 'text-green-600' : 'text-gray-400'}>中文</span>
+                <span className="text-gray-300">|</span>
+                <span className={lang === 'en' ? 'text-green-600' : 'text-gray-400'}>EN</span>
+            </button>
+        );
+
         // --- 組件: Verifiable Credential Modal ---
-        const CredentialModal = ({ isOpen, onClose, data }) => {
+        const CredentialModal = ({ isOpen, onClose, data, lang }) => {
             const [viewMode, setViewMode] = useState('visual'); 
             const [verificationState, setVerificationState] = useState('idle'); 
             const [logs, setLogs] = useState([]);
             const logEndRef = useRef(null);
+            const t = TRANSLATIONS[lang];
 
             useEffect(() => {
                 if (isOpen) {
@@ -194,7 +330,6 @@
                 }
             }, [isOpen]);
 
-            // 自動捲動到日誌底部
             useEffect(() => {
                 logEndRef.current?.scrollIntoView({ behavior: "smooth" });
             }, [logs]);
@@ -203,44 +338,43 @@
                 setVerificationState('verifying');
                 setLogs([]);
                 
-                // 模擬真實的驗證步驟
                 const addLog = (text, type = 'info') => {
                     setLogs(prev => [...prev, { text, type, time: new Date().toLocaleTimeString() }]);
                 };
 
-                addLog("Initializing Verifiable Credential verification...", 'info');
+                addLog(t.logInit, 'info');
                 
                 setTimeout(() => {
-                    addLog(`> Resolving Issuer DID: ${data.issuer}`, 'cmd');
+                    addLog(`${t.logResolve} ${data.issuer}`, 'cmd');
                 }, 800);
 
                 setTimeout(() => {
-                    addLog(`  ✔ DID Document fetched successfully`, 'success');
-                    addLog(`  ✔ Public Key found: key-1 (Ed25519VerificationKey2018)`, 'success');
+                    addLog(`  ✔ ${t.logDidFetched}`, 'success');
+                    addLog(`  ✔ ${t.logKeyFound}`, 'success');
                 }, 1800);
 
                 setTimeout(() => {
-                    addLog(`> Verifying JWS Signature...`, 'cmd');
+                    addLog(`> ${t.logVerifySig}`, 'cmd');
                     addLog(`  Payload digest: sha256:${data.credentialSubject.gtin.substring(0,8)}...`, 'detail');
                 }, 2800);
 
                 setTimeout(() => {
-                    addLog(`  ✔ Signature valid. Integrity check passed.`, 'success');
+                    addLog(`  ✔ ${t.logSigValid}`, 'success');
                 }, 3800);
 
                 setTimeout(() => {
-                    addLog(`> Checking Revocation Status (StatusList2021)...`, 'cmd');
+                    addLog(`> ${t.logCheckRevoke}`, 'cmd');
                     addLog(`  Registry: ethereum:mainnet:0x123...abc`, 'detail');
                 }, 4800);
 
                 setTimeout(() => {
-                    addLog(`  ✔ Credential is ACTIVE (Not Revoked)`, 'success');
+                    addLog(`  ✔ ${t.logActive}`, 'success');
                     if (data.credentialSubject.grsCertification) {
-                        addLog(`> Validating GRS Schema Compliance...`, 'cmd');
-                        addLog(`  ✔ Schema: GRS 4.0 Verified`, 'success');
+                        addLog(`> ${t.logGrsCheck}`, 'cmd');
+                        addLog(`  ✔ ${t.logGrsValid}`, 'success');
                     }
                     setVerificationState('verified');
-                    addLog("Verification Process Complete.", 'done');
+                    addLog(t.logComplete, 'done');
                 }, 5800);
             };
 
@@ -255,8 +389,8 @@
                             <div className="flex items-center gap-2">
                                 <ShieldCheck className="w-6 h-6 text-green-400" />
                                 <div>
-                                    <h3 className="font-bold text-lg">可驗證數位憑證</h3>
-                                    <p className="text-xs text-slate-400">Verifiable Credential (W3C Standard)</p>
+                                    <h3 className="font-bold text-lg">{t.vcTitle}</h3>
+                                    <p className="text-xs text-slate-400">{t.vcSubtitle}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-1 hover:bg-slate-800 rounded-full transition"><X className="w-6 h-6" /></button>
@@ -270,13 +404,13 @@
                                     onClick={() => setViewMode('visual')}
                                     className={`flex-1 py-2 text-sm font-medium rounded-md transition flex items-center justify-center gap-2 ${viewMode === 'visual' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
-                                    <ShieldCheck className="w-4 h-4" /> 憑證檢視
+                                    <ShieldCheck className="w-4 h-4" /> {t.tabView}
                                 </button>
                                 <button 
                                     onClick={() => setViewMode('json')}
                                     className={`flex-1 py-2 text-sm font-medium rounded-md transition flex items-center justify-center gap-2 ${viewMode === 'json' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
-                                    <FileJson className="w-4 h-4" /> 原始資料 (JSON-LD)
+                                    <FileJson className="w-4 h-4" /> {t.tabJson}
                                 </button>
                             </div>
 
@@ -287,64 +421,64 @@
                                         {verificationState === 'verified' && (
                                             <div className="absolute top-0 right-0 p-2 animate-fadeIn">
                                                 <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-green-200 shadow-sm">
-                                                    <CheckCircle className="w-3 h-3" /> 已驗證 (Verified)
+                                                    <CheckCircle className="w-3 h-3" /> Verified
                                                 </div>
                                             </div>
                                         )}
                                         
                                         <div className="space-y-4">
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">發證者 (Issuer)</p>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t.issuer}</p>
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">DID</div>
                                                     <p className="text-sm font-mono text-slate-700 truncate">{data.issuer}</p>
                                                 </div>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">憑證持有者 (Subject)</p>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t.subject}</p>
                                                 <p className="text-sm font-mono text-slate-700 truncate">{data.credentialSubject.id}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">頒發日期</p>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t.date}</p>
                                                 <p className="text-sm text-slate-700">{new Date(data.issuanceDate).toLocaleDateString()} {new Date(data.issuanceDate).toLocaleTimeString()}</p>
                                             </div>
 
-                                            {/* GRS 特殊顯示區塊 (如果憑證有 GRS 資料) */}
+                                            {/* GRS 特殊顯示區塊 */}
                                             {data.credentialSubject.grsCertification && (
                                                 <div className="mt-4 pt-4 border-t border-slate-100">
                                                     <p className="text-xs text-green-600 uppercase font-bold tracking-wider mb-2 flex items-center gap-1">
-                                                        <Recycle className="w-3 h-3" /> GRS 認證摘要
+                                                        <Recycle className="w-3 h-3" /> {t.grsTitle}
                                                     </p>
                                                     <div className="bg-green-50 rounded-lg p-3 text-sm space-y-2">
                                                         <div className="flex justify-between">
-                                                            <span className="text-slate-600">標準:</span>
+                                                            <span className="text-slate-600">{t.grsStandard}:</span>
                                                             <span className="font-semibold text-slate-800">{data.credentialSubject.grsCertification.standard}</span>
                                                         </div>
                                                         <div className="flex justify-between">
-                                                            <span className="text-slate-600">再生比例:</span>
+                                                            <span className="text-slate-600">{t.grsRatio}:</span>
                                                             <span className="font-bold text-green-700">{data.credentialSubject.grsCertification.percentage}</span>
                                                         </div>
                                                         <div className="flex justify-between">
-                                                            <span className="text-slate-600">證書編號:</span>
+                                                            <span className="text-slate-600">{t.grsCertNo}:</span>
                                                             <span className="font-mono text-slate-800">{data.credentialSubject.grsCertification.certificateNo}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )}
 
-                                            {/* 營建法規 CPR 特殊顯示區塊 */}
+                                            {/* CPR 特殊顯示區塊 */}
                                             {data.credentialSubject.constructionDeclaration && (
                                                 <div className="mt-2">
                                                     <p className="text-xs text-blue-600 uppercase font-bold tracking-wider mb-2 flex items-center gap-1">
-                                                        <Building className="w-3 h-3" /> 歐盟 CPR 宣告
+                                                        <Building className="w-3 h-3" /> {t.cprTitle}
                                                     </p>
                                                     <div className="bg-blue-50 rounded-lg p-3 text-sm space-y-2">
                                                         <div className="flex justify-between">
-                                                            <span className="text-slate-600">DoP 編號:</span>
+                                                            <span className="text-slate-600">{t.cprDop}:</span>
                                                             <span className="font-mono text-slate-800">{data.credentialSubject.constructionDeclaration.dopNumber}</span>
                                                         </div>
                                                         <div className="flex justify-between">
-                                                            <span className="text-slate-600">防火等級:</span>
+                                                            <span className="text-slate-600">{t.cprFire}:</span>
                                                             <span className="font-bold text-blue-800">{data.credentialSubject.constructionDeclaration.fireClassification}</span>
                                                         </div>
                                                     </div>
@@ -360,7 +494,7 @@
                                                 onClick={runVerification}
                                                 className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-slate-200"
                                             >
-                                                <Lock className="w-4 h-4" /> 驗證數位簽章 (Start Verification)
+                                                <Lock className="w-4 h-4" /> {t.btnVerify}
                                             </button>
                                         ) : (
                                             <div className="space-y-3">
@@ -382,14 +516,15 @@
                                                 {verificationState === 'verifying' && (
                                                     <div className="flex items-center gap-3 animate-fadeIn justify-center pt-2">
                                                         <Loader className="w-5 h-5 text-slate-400" />
-                                                        <span className="text-sm text-slate-500">正在與去中心化網絡通訊中...</span>
+                                                        <span className="text-sm text-slate-500">{t.statusVerifying}</span>
                                                     </div>
                                                 )}
                                                 
                                                 {verificationState === 'verified' && (
                                                     <div className="mt-4 p-3 bg-green-50 rounded-xl border border-green-100 text-center animate-fadeIn">
-                                                        <p className="text-green-800 font-bold text-base mb-1">驗證成功 (Success)</p>
-                                                        <p className="text-green-600 text-xs">DID 解析正確 • 簽章有效 • 證書未撤銷</p>
+                                                        <p className="text-green-800 font-bold text-base mb-1">{t.statusSuccess}</p>
+                                                        <p className="text-green-600 text-xs">{t.statusSuccessDesc}</p>
+                                                        <p className="text-green-600 text-[10px] mt-1 opacity-80">{t.statusSuccessDetail}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -409,91 +544,101 @@
         };
 
         // --- 組件: 首頁 ---
-        const LandingPage = ({ onScan }) => (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
-                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full animate-fadeIn">
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-green-100 p-4 rounded-full">
-                            <QrCode className="w-12 h-12 text-green-600" />
-                        </div>
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-800 mb-2">產品數位護照</h1>
-                    <p className="text-gray-500 mb-4 text-sm">
-                        請掃描產品上的 Digital Link QR Code 以查看產品履歷。
-                    </p>
-
-                    <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-8 text-left">
-                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Digital Link 網址格式</p>
-                        <p className="text-xs font-mono text-gray-600 break-all select-all">
-                        https://dpp-demo.sdpp.tw/#/01/<span className="text-green-600">{'{GTIN}'}</span>
-                        </p>
-                    </div>
+        const LandingPage = ({ onScan, lang, setLang }) => {
+            const t = TRANSLATIONS[lang];
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center relative">
+                    <LanguageSwitcher lang={lang} setLang={setLang} />
                     
-                    <div className="border-t border-gray-100 pt-6">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">開發測試連結 (模擬掃描)</p>
-                        <div className="space-y-3">
-                            {Object.entries(PRODUCT_DATABASE).map(([gtin, prod]) => (
-                                <button 
-                                    key={gtin}
-                                    onClick={() => onScan(gtin)}
-                                    className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition flex items-center justify-between group"
-                                >
-                                    <div className="text-left">
-                                        <span className="block font-medium text-sm text-gray-800 group-hover:text-green-800">{prod.name}</span>
-                                        <span className="block text-xs text-gray-400 font-mono">GTIN: {gtin}</span>
-                                    </div>
-                                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
-                                </button>
-                            ))}
+                    <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full animate-fadeIn">
+                        <div className="flex justify-center mb-6">
+                            <div className="bg-green-100 p-4 rounded-full">
+                                <QrCode className="w-12 h-12 text-green-600" />
+                            </div>
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-800 mb-2">{t.title}</h1>
+                        <p className="text-gray-500 mb-4 text-sm">
+                            {t.subtitle}
+                        </p>
+
+                        <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-8 text-left">
+                            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{t.formatTitle}</p>
+                            <p className="text-xs font-mono text-gray-600 break-all select-all">
+                            https://dpp-demo.sdpp.tw/#/01/<span className="text-green-600">{'{GTIN}'}</span>
+                            </p>
+                        </div>
+                        
+                        <div className="border-t border-gray-100 pt-6">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">{t.devLinks}</p>
+                            <div className="space-y-3">
+                                {Object.entries(PRODUCT_DATABASE).map(([gtin, prod]) => (
+                                    <button 
+                                        key={gtin}
+                                        onClick={() => onScan(gtin)}
+                                        className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition flex items-center justify-between group"
+                                    >
+                                        <div className="text-left">
+                                            <span className="block font-medium text-sm text-gray-800 group-hover:text-green-800">{prod.name[lang]}</span>
+                                            <span className="block text-xs text-gray-400 font-mono">GTIN: {gtin}</span>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
+                    <div className="mt-8 text-xs text-gray-400 flex items-center justify-center gap-1">
+                        {t.poweredBy} <span className="font-semibold text-gray-500">dpp-demo.sdpp.tw</span>
+                    </div>
                 </div>
-                <div className="mt-8 text-xs text-gray-400 flex items-center justify-center gap-1">
-                    Powered by <span className="font-semibold text-gray-500">dpp-demo.sdpp.tw</span>
-                </div>
-            </div>
-        );
+            );
+        };
 
         // --- 組件: 產品詳情頁 ---
-        const PassportPage = ({ product, gtin, onBack }) => {
+        const PassportPage = ({ product, gtin, onBack, lang, setLang }) => {
             const [activeTab, setActiveTab] = useState('traceability');
             const [isCredentialOpen, setIsCredentialOpen] = useState(false);
+            const t = TRANSLATIONS[lang];
 
             if (!product) return (
-                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6 relative">
+                    <LanguageSwitcher lang={lang} setLang={setLang} />
                     <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-sm w-full animate-fadeIn">
                         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <X className="w-8 h-8 text-red-500" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-800">查無此產品</h2>
-                        <p className="text-gray-600 mt-2 text-sm">系統資料庫中找不到 GTIN 編號：<br/><span className="font-mono bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{gtin}</span></p>
-                        <button onClick={onBack} className="mt-6 w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition font-medium">返回首頁</button>
+                        <h2 className="text-xl font-bold text-gray-800">{t.notFoundTitle}</h2>
+                        <p className="text-gray-600 mt-2 text-sm">{t.notFoundDesc}<br/><span className="font-mono bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{gtin}</span></p>
+                        <button onClick={onBack} className="mt-6 w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition font-medium">{t.backHome}</button>
                     </div>
                 </div>
             );
 
             return (
                 <div className="min-h-screen bg-gray-50 pb-12 animate-fadeIn relative">
+                    <LanguageSwitcher lang={lang} setLang={setLang} />
+                    
                     <CredentialModal 
                         isOpen={isCredentialOpen} 
                         onClose={() => setIsCredentialOpen(false)} 
                         data={product.verifiableCredential}
+                        lang={lang}
                     />
 
                     <div className="relative h-72 w-full bg-gray-900">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover opacity-90" />
+                        <img src={product.image} alt={product.name[lang]} className="w-full h-full object-cover opacity-90" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                        <button onClick={onBack} className="absolute top-4 left-4 bg-black/30 backdrop-blur-md text-white p-2 rounded-full hover:bg-black/50 transition border border-white/10">
+                        <button onClick={onBack} className="absolute top-4 left-4 bg-black/30 backdrop-blur-md text-white p-2 rounded-full hover:bg-black/50 transition border border-white/10 z-40">
                             <ArrowRight className="w-5 h-5 rotate-180" />
                         </button>
                         <div className="absolute bottom-0 left-0 right-0 p-6">
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="px-2 py-0.5 bg-green-500/90 text-white text-[10px] font-bold tracking-wider rounded uppercase backdrop-blur-sm flex items-center gap-1">
-                                    <ShieldCheck className="w-3 h-3" /> Verifiable Credential
+                                    <ShieldCheck className="w-3 h-3" /> {t.verifiedPassport}
                                 </span>
                             </div>
-                            <h1 className="text-2xl font-bold text-white leading-tight mb-1">{product.name}</h1>
-                            <p className="text-white/80 text-sm font-medium">{product.brand}</p>
+                            <h1 className="text-2xl font-bold text-white leading-tight mb-1">{product.name[lang]}</h1>
+                            <p className="text-white/80 text-sm font-medium">{product.brand[lang]}</p>
                         </div>
                     </div>
 
@@ -511,7 +656,7 @@
                                         {tab === 'materials' && <Recycle className="w-4 h-4" />}
                                         {tab === 'info' && <Info className="w-4 h-4" />}
                                         <span className="capitalize">
-                                            {tab === 'traceability' ? '旅程' : tab === 'materials' ? '材質' : '資訊'}
+                                            {tab === 'traceability' ? t.tabTraceability : tab === 'materials' ? t.tabMaterials : t.tabInfo}
                                         </span>
                                         {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600 rounded-t-full mx-4" />}
                                     </button>
@@ -522,8 +667,8 @@
                                 {activeTab === 'traceability' && (
                                     <div className="animate-fadeIn">
                                         <div className="flex items-center justify-between mb-6">
-                                            <h3 className="font-bold text-gray-800 text-lg">產品足跡</h3>
-                                            <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full font-medium">全供應鏈追溯</span>
+                                            <h3 className="font-bold text-gray-800 text-lg">{t.footprintTitle}</h3>
+                                            <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full font-medium">{t.footprintBadge}</span>
                                         </div>
                                         <div className="relative border-l-2 border-gray-100 pl-8 space-y-8 ml-2">
                                             {product.traceability.map((step, idx) => (
@@ -534,8 +679,8 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <span className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 block">{step.step}</span>
-                                                        <p className="text-gray-900 font-bold text-base">{step.location}</p>
+                                                        <span className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 block">{step.step[lang]}</span>
+                                                        <p className="text-gray-900 font-bold text-base">{step.location[lang]}</p>
                                                         <p className="text-sm text-gray-400 mt-1 font-mono">{step.date}</p>
                                                     </div>
                                                 </div>
@@ -546,12 +691,12 @@
                                 {activeTab === 'materials' && (
                                     <div className="space-y-8 animate-fadeIn">
                                         <div>
-                                            <h3 className="font-bold text-gray-800 text-lg mb-4">材質組成</h3>
+                                            <h3 className="font-bold text-gray-800 text-lg mb-4">{t.materialComp}</h3>
                                             <div className="space-y-5">
                                                 {product.materials.map((mat, idx) => (
                                                     <div key={idx}>
                                                         <div className="flex justify-between text-sm mb-2">
-                                                            <span className="font-medium text-gray-700">{mat.name}</span>
+                                                            <span className="font-medium text-gray-700">{mat.name[lang]}</span>
                                                             <span className="font-bold text-gray-900">{mat.percentage}%</span>
                                                         </div>
                                                         <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
@@ -563,33 +708,28 @@
                                         </div>
                                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-100">
                                             <h4 className="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
-                                                <Recycle className="w-4 h-4" /> 回收指示
+                                                <Recycle className="w-4 h-4" /> {t.recyclingInst}
                                             </h4>
-                                            <p className="text-sm text-blue-800/80 leading-relaxed">{product.disposal}</p>
+                                            <p className="text-sm text-blue-800/80 leading-relaxed">{product.disposal[lang]}</p>
                                         </div>
                                     </div>
                                 )}
                                 {activeTab === 'info' && (
                                     <div className="space-y-6 animate-fadeIn">
-                                        <h3 className="font-bold text-gray-800 text-lg">產品規格</h3>
+                                        <h3 className="font-bold text-gray-800 text-lg">{t.specsTitle}</h3>
                                         <div className="grid grid-cols-2 gap-3">
                                             {/* 動態渲染規格 */}
                                             {Object.entries(product.specs).map(([key, value]) => (
                                                 <div key={key} className={`p-4 bg-gray-50 rounded-xl border border-gray-100 ${key === 'batch' || key === 'ceMark' ? 'col-span-2' : ''}`}>
                                                     <span className="text-xs text-gray-400 block mb-1 capitalize">
-                                                        {key === 'color' ? '顏色/外觀' : 
-                                                         key === 'size' ? '尺寸/規格' : 
-                                                         key === 'batch' ? '生產批號' : 
-                                                         key === 'fireRating' ? '防火等級 (Euroclass)' :
-                                                         key === 'nrc' ? '吸音性能 (NRC)' :
-                                                         key === 'ceMark' ? 'CE 認證標準' : key}
+                                                        {t.specKeys[key] || key}
                                                     </span>
-                                                    <span className="text-sm font-semibold text-gray-800">{value}</span>
+                                                    <span className="text-sm font-semibold text-gray-800">{value[lang]}</span>
                                                 </div>
                                             ))}
                                             
                                             <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 col-span-2">
-                                                <span className="text-xs text-gray-400 block mb-1">GTIN (全球識別碼)</span>
+                                                <span className="text-xs text-gray-400 block mb-1">{t.gtinLabel}</span>
                                                 <span className="text-sm font-semibold text-gray-800 font-mono tracking-wide">{gtin}</span>
                                             </div>
                                         </div>
@@ -601,10 +741,10 @@
                                                 className="w-full flex items-center justify-center gap-2 text-sm text-green-600 font-bold bg-green-50 py-3 rounded-lg hover:bg-green-100 transition"
                                             >
                                                 <ShieldCheck className="w-4 h-4" />
-                                                驗證區塊鏈證書 (Verifiable Credential)
+                                                {t.verifyBtn}
                                             </button>
                                             <p className="text-xs text-center text-gray-400 mt-2">
-                                                點擊上方按鈕以執行 W3C 標準 DID 驗證
+                                                {t.verifyHint}
                                             </p>
                                         </div>
                                     </div>
@@ -619,6 +759,7 @@
         // --- 主程式 ---
         const App = () => {
             const [currentGtin, setCurrentGtin] = useState(null);
+            const [lang, setLang] = useState('zh'); // 預設語言: 中文
 
             const getGtinFromHash = () => {
                 const hash = window.location.hash; 
@@ -648,9 +789,9 @@
 
             if (currentGtin) {
                 const product = PRODUCT_DATABASE[currentGtin];
-                return <PassportPage product={product} gtin={currentGtin} onBack={navigateHome} />;
+                return <PassportPage product={product} gtin={currentGtin} onBack={navigateHome} lang={lang} setLang={setLang} />;
             }
-            return <LandingPage onScan={navigateToProduct} />;
+            return <LandingPage onScan={navigateToProduct} lang={lang} setLang={setLang} />;
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
