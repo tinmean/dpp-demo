@@ -5,32 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>數位產品護照 | Digital Product Passport</title>
     
-    <!-- 1. 載入 Tailwind CSS (樣式) -->
+    <!-- 1. 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. 載入 React 和 Babel (核心運作庫) -->
+    <!-- 2. 載入 React 和 Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- 自定義樣式調整 -->
+    <!-- 自定義樣式 -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
         .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slideUp { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* 模擬程式碼區塊樣式 */
+        .json-bg { background-color: #1e1e1e; color: #d4d4d4; }
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
 
-    <!-- React 應用程式掛載點 -->
     <div id="root"></div>
 
-    <!-- 3. React 程式碼邏輯 (Type="text/babel") -->
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- Icon 組件 (將原本的 Lucide 圖示改為 SVG 以便在單一 HTML 運作) ---
+        // --- Icon 組件 ---
         const IconBase = ({ children, className }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
         );
@@ -43,9 +50,12 @@
         const Package = (p) => <IconBase {...p}><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22v-9"/></IconBase>;
         const ArrowRight = (p) => <IconBase {...p}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></IconBase>;
         const X = (p) => <IconBase {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
-        const ExternalLink = (p) => <IconBase {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></IconBase>;
+        const ShieldCheck = (p) => <IconBase {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></IconBase>;
+        const FileJson = (p) => <IconBase {...p}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13a2 2 0 0 0 2 2h4"/><path d="M12 15v3"/></IconBase>;
+        const Lock = (p) => <IconBase {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></IconBase>;
+        const Loader = (p) => <IconBase {...p} className={`${p.className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
 
-        // --- 產品資料庫 ---
+        // --- 產品資料庫 (新增 verifiableCredential 欄位) ---
         const PRODUCT_DATABASE = {
             "09876543210123": {
                 name: "EcoStep Pro 跑鞋",
@@ -59,7 +69,27 @@
                     { step: "最終組裝", location: "越南, 胡志明", date: "2024-01-20", icon: CheckCircle },
                 ],
                 materials: [{ name: "回收 PET", percentage: 80 }, { name: "天然橡膠", percentage: 20 }],
-                disposal: "可透過品牌門市回收計畫進行回收。"
+                disposal: "可透過品牌門市回收計畫進行回收。",
+                verifiableCredential: {
+                    "@context": ["https://www.w3.org/2018/credentials/v1"],
+                    "type": ["VerifiableCredential", "SustainableProductClaim"],
+                    "issuer": "did:web:issuer.greenwalk.com",
+                    "issuanceDate": "2023-11-20T19:23:24Z",
+                    "credentialSubject": {
+                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210123",
+                        "gtin": "09876543210123",
+                        "claim": {
+                            "recycledContent": "80%",
+                            "carbonNeutral": true
+                        }
+                    },
+                    "proof": {
+                        "type": "JsonWebSignature2020",
+                        "created": "2023-11-20T19:23:24Z",
+                        "verificationMethod": "did:web:issuer.greenwalk.com#key-1",
+                        "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..."
+                    }
+                }
             },
             "09876543210456": {
                 name: "PureCotton 經典 T-shirt",
@@ -73,7 +103,18 @@
                     { step: "品檢包裝", location: "德國, 漢堡", date: "2023-10-10", icon: CheckCircle },
                 ],
                 materials: [{ name: "有機棉", percentage: 100 }],
-                disposal: "可自然生物降解，或投入衣物回收箱。"
+                disposal: "可自然生物降解，或投入衣物回收箱。",
+                verifiableCredential: {
+                    "@context": ["https://www.w3.org/2018/credentials/v1"],
+                    "type": ["VerifiableCredential", "OrganicCottonCert"],
+                    "issuer": "did:web:cert.global-organic.org",
+                    "issuanceDate": "2023-09-15T10:00:00Z",
+                    "credentialSubject": {
+                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210456",
+                        "gtin": "09876543210456",
+                        "certificationLevel": "GOTS Certified"
+                    }
+                }
             },
             "09876543210789": {
                 name: "EcoBottle 環保水壺",
@@ -86,8 +127,160 @@
                     { step: "成型加工", location: "台南, 台灣", date: "2024-01-15", icon: Package }
                 ],
                 materials: [{ name: "304 不鏽鋼", percentage: 95 }, { name: "矽膠", percentage: 5 }],
-                disposal: "金屬部分可無限次回收。"
+                disposal: "金屬部分可無限次回收。",
+                verifiableCredential: {
+                    "@context": ["https://www.w3.org/2018/credentials/v1"],
+                    "type": ["VerifiableCredential", "MaterialSafetyCert"],
+                    "issuer": "did:web:sgs-lab.com",
+                    "issuanceDate": "2024-01-10T14:30:00Z",
+                    "credentialSubject": {
+                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210789",
+                        "gtin": "09876543210789",
+                        "bpaFree": true
+                    }
+                }
             }
+        };
+
+        // --- 組件: Verifiable Credential Modal (新增功能) ---
+        const CredentialModal = ({ isOpen, onClose, data }) => {
+            const [viewMode, setViewMode] = useState('visual'); // 'visual' or 'json'
+            const [verificationState, setVerificationState] = useState('idle'); // idle, verifying, verified
+            const [steps, setSteps] = useState([]);
+
+            useEffect(() => {
+                if (isOpen) {
+                    setVerificationState('idle');
+                    setSteps([]);
+                }
+            }, [isOpen]);
+
+            const runVerification = () => {
+                setVerificationState('verifying');
+                setSteps([]);
+                
+                // 模擬驗證過程
+                setTimeout(() => setSteps(s => [...s, { text: "解析發證者 DID (Decentralized Identifier)...", status: "done" }]), 500);
+                setTimeout(() => setSteps(s => [...s, { text: "取得公開金鑰 (Public Key)...", status: "done" }]), 1500);
+                setTimeout(() => setSteps(s => [...s, { text: "驗證數位簽章 (Cryptographic Proof)...", status: "done" }]), 2500);
+                setTimeout(() => setSteps(s => [...s, { text: "檢查撤銷清單 (Revocation Registry)...", status: "done" }]), 3500);
+                setTimeout(() => {
+                    setVerificationState('verified');
+                }, 4000);
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh] animate-slideUp">
+                        {/* Header */}
+                        <div className="bg-slate-900 text-white p-5 flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-6 h-6 text-green-400" />
+                                <div>
+                                    <h3 className="font-bold text-lg">可驗證數位憑證</h3>
+                                    <p className="text-xs text-slate-400">Verifiable Credential (W3C Standard)</p>
+                                </div>
+                            </div>
+                            <button onClick={onClose} className="p-1 hover:bg-slate-800 rounded-full transition"><X className="w-6 h-6" /></button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto flex-1">
+                            {/* Tabs */}
+                            <div className="flex gap-2 mb-6 bg-slate-100 p-1 rounded-lg">
+                                <button 
+                                    onClick={() => setViewMode('visual')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition flex items-center justify-center gap-2 ${viewMode === 'visual' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    <ShieldCheck className="w-4 h-4" /> 憑證檢視
+                                </button>
+                                <button 
+                                    onClick={() => setViewMode('json')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition flex items-center justify-center gap-2 ${viewMode === 'json' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    <FileJson className="w-4 h-4" /> 原始資料 (JSON-LD)
+                                </button>
+                            </div>
+
+                            {viewMode === 'visual' ? (
+                                <div className="space-y-6">
+                                    {/* 憑證卡片 */}
+                                    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50 relative overflow-hidden">
+                                        {verificationState === 'verified' && (
+                                            <div className="absolute top-0 right-0 p-2">
+                                                <div className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-green-200 shadow-sm">
+                                                    <CheckCircle className="w-3 h-3" /> 已驗證 (Verified)
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="space-y-4">
+                                            <div>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">發證者 (Issuer)</p>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">DID</div>
+                                                    <p className="text-sm font-mono text-slate-700 truncate">{data.issuer}</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">憑證持有者 (Subject)</p>
+                                                <p className="text-sm font-mono text-slate-700 truncate">{data.credentialSubject.id}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">頒發日期</p>
+                                                <p className="text-sm text-slate-700">{new Date(data.issuanceDate).toLocaleDateString()} {new Date(data.issuanceDate).toLocaleTimeString()}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* 驗證區塊 */}
+                                    <div className="border-t border-slate-100 pt-6">
+                                        {verificationState === 'idle' ? (
+                                            <button 
+                                                onClick={runVerification}
+                                                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-slate-200"
+                                            >
+                                                <Lock className="w-4 h-4" /> 驗證數位簽章
+                                            </button>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {steps.map((step, idx) => (
+                                                    <div key={idx} className="flex items-center gap-3 animate-fadeIn">
+                                                        <div className="bg-green-100 p-1 rounded-full">
+                                                            <CheckCircle className="w-4 h-4 text-green-600" />
+                                                        </div>
+                                                        <span className="text-sm text-slate-700 font-medium">{step.text}</span>
+                                                    </div>
+                                                ))}
+                                                {verificationState === 'verifying' && (
+                                                    <div className="flex items-center gap-3 animate-fadeIn">
+                                                        <Loader className="w-6 h-6 text-slate-400" />
+                                                        <span className="text-sm text-slate-400">正在與區塊鏈網路通訊...</span>
+                                                    </div>
+                                                )}
+                                                {verificationState === 'verified' && (
+                                                    <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-100 text-center animate-fadeIn">
+                                                        <p className="text-green-800 font-bold text-lg mb-1">驗證成功</p>
+                                                        <p className="text-green-600 text-sm">此產品護照資料真實且未被篡改。</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                // JSON 檢視模式
+                                <div className="json-bg p-4 rounded-xl overflow-x-auto text-xs font-mono h-80 shadow-inner">
+                                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
         // --- 組件: 首頁 ---
@@ -139,6 +332,7 @@
         // --- 組件: 產品詳情頁 ---
         const PassportPage = ({ product, gtin, onBack }) => {
             const [activeTab, setActiveTab] = useState('traceability');
+            const [isCredentialOpen, setIsCredentialOpen] = useState(false);
 
             if (!product) return (
                 <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -154,7 +348,13 @@
             );
 
             return (
-                <div className="min-h-screen bg-gray-50 pb-12 animate-fadeIn">
+                <div className="min-h-screen bg-gray-50 pb-12 animate-fadeIn relative">
+                    <CredentialModal 
+                        isOpen={isCredentialOpen} 
+                        onClose={() => setIsCredentialOpen(false)} 
+                        data={product.verifiableCredential}
+                    />
+
                     <div className="relative h-72 w-full bg-gray-900">
                         <img src={product.image} alt={product.name} className="w-full h-full object-cover opacity-90" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -163,7 +363,9 @@
                         </button>
                         <div className="absolute bottom-0 left-0 right-0 p-6">
                             <div className="flex items-center gap-2 mb-2">
-                                <span className="px-2 py-0.5 bg-green-500/90 text-white text-[10px] font-bold tracking-wider rounded uppercase backdrop-blur-sm">Verified Passport</span>
+                                <span className="px-2 py-0.5 bg-green-500/90 text-white text-[10px] font-bold tracking-wider rounded uppercase backdrop-blur-sm flex items-center gap-1">
+                                    <ShieldCheck className="w-3 h-3" /> Verifiable Credential
+                                </span>
                             </div>
                             <h1 className="text-2xl font-bold text-white leading-tight mb-1">{product.name}</h1>
                             <p className="text-white/80 text-sm font-medium">{product.brand}</p>
@@ -266,10 +468,19 @@
                                                 <span className="text-sm font-semibold text-gray-800 font-mono tracking-wide">{gtin}</span>
                                             </div>
                                         </div>
+                                        
+                                        {/* 新增: 觸發 VC Modal 的按鈕區塊 */}
                                         <div className="pt-4 border-t border-gray-100">
-                                            <a href="#" className="flex items-center justify-center gap-2 text-sm text-green-600 font-medium hover:underline">
-                                                查看完整區塊鏈證書 <ExternalLink className="w-3 h-3" />
-                                            </a>
+                                            <button 
+                                                onClick={() => setIsCredentialOpen(true)}
+                                                className="w-full flex items-center justify-center gap-2 text-sm text-green-600 font-bold bg-green-50 py-3 rounded-lg hover:bg-green-100 transition"
+                                            >
+                                                <ShieldCheck className="w-4 h-4" />
+                                                驗證區塊鏈證書 (Verifiable Credential)
+                                            </button>
+                                            <p className="text-xs text-center text-gray-400 mt-2">
+                                                點擊上方按鈕以執行 W3C 標準 DID 驗證
+                                            </p>
                                         </div>
                                     </div>
                                 )}
@@ -280,7 +491,7 @@
             );
         };
 
-        // --- 主程式: 處理 Hash 路由 ---
+        // --- 主程式 ---
         const App = () => {
             const [currentGtin, setCurrentGtin] = useState(null);
 
