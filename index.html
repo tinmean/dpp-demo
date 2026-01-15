@@ -54,6 +54,7 @@
                 verifiedPassport: "已驗證護照",
                 tabTraceability: "旅程 (UNTP)",
                 tabMaterials: "材質",
+                tabCircular: "永續循環", // 新增
                 tabInfo: "資訊",
                 footprintTitle: "供應鏈事件追溯",
                 footprintBadge: "符合 UNTP/EPCIS 標準",
@@ -99,6 +100,10 @@
                 untpEvent: "事件類型",
                 untpBizStep: "業務步驟",
                 untpVerify: "事件已上鏈驗證",
+                repairScore: "維修性指數",
+                carbonFootprint: "碳足跡 (PCF)",
+                documents: "文件與備品",
+                download: "下載",
                 specKeys: {
                     color: "顏色/外觀",
                     size: "尺寸/規格",
@@ -120,6 +125,7 @@
                 verifiedPassport: "Verified Passport",
                 tabTraceability: "Journey (UNTP)",
                 tabMaterials: "Materials",
+                tabCircular: "Circularity", // New
                 tabInfo: "Info",
                 footprintTitle: "Supply Chain Events",
                 footprintBadge: "UNTP/EPCIS Compliant",
@@ -165,6 +171,10 @@
                 untpEvent: "Event Type",
                 untpBizStep: "BizStep",
                 untpVerify: "Event Verified On-Chain",
+                repairScore: "Repairability Index",
+                carbonFootprint: "Carbon Footprint (PCF)",
+                documents: "Documents & Parts",
+                download: "Download",
                 specKeys: {
                     color: "Color",
                     size: "Size",
@@ -197,9 +207,12 @@
         const Languages = (p) => <IconBase {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconBase>;
         const Hash = (p) => <IconBase {...p}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></IconBase>;
         const Link = (p) => <IconBase {...p}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></IconBase>;
+        const Wrench = (p) => <IconBase {...p}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></IconBase>;
+        const FileText = (p) => <IconBase {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></IconBase>;
+        const Leaf = (p) => <IconBase {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></IconBase>;
 
 
-        // --- 產品資料庫 (支援雙語結構 + UNTP Event Traceability) ---
+        // --- 產品資料庫 (支援雙語結構 + UNTP Event Traceability + Circular Data) ---
         const PRODUCT_DATABASE = {
             "09876543210999": {
                 name: { zh: "EcoSound 再生吸音板", en: "EcoSound Recycled Acoustic Panel" },
@@ -217,14 +230,22 @@
                     nrc: { zh: "0.85 (吸音係數)", en: "0.85 (NRC)" },
                     ceMark: { zh: "Yes (EN 15102)", en: "Yes (EN 15102)" }
                 },
-                // Updated with UNTP/EPCIS fields: GLN, Event Type, BizStep
+                // Circular & Sustainability Data
+                circularity: {
+                    repairability: { score: 9.2, grade: "A", label: { zh: "極易維修", en: "Easy to Repair" } },
+                    carbonFootprint: { value: "12.5 kg CO2e", label: { zh: "每平方公尺", en: "per m2" } },
+                    documents: [
+                        { title: { zh: "安裝與維護手冊", en: "Installation & Maintenance Guide" }, type: "PDF" },
+                        { title: { zh: "拆解與回收指南", en: "Disassembly & Recycling Instructions" }, type: "PDF" }
+                    ]
+                },
                 traceability: [
                     { 
                         step: { zh: "PET 瓶磚回收", en: "PET Bottle Bale Recycling" }, 
                         location: { zh: "德國, 柏林", en: "Berlin, Germany" }, 
                         date: "2023-11-05", 
                         icon: Recycle,
-                        gln: "4012345000009", // GLN for facility
+                        gln: "4012345000009", 
                         type: "ObjectEvent",
                         bizStep: "urn:epcglobal:cbv:bizstep:collecting"
                     },
@@ -285,6 +306,13 @@
                     size: { zh: "US 10", en: "US 10" }, 
                     batch: { zh: "2024-Q1-TW", en: "2024-Q1-TW" } 
                 },
+                circularity: {
+                    repairability: { score: 7.5, grade: "B", label: { zh: "可更換鞋底", en: "Resolable" } },
+                    carbonFootprint: { value: "8.2 kg CO2e", label: { zh: "每雙", en: "per pair" } },
+                    documents: [
+                        { title: { zh: "保養說明書", en: "Care Instructions" }, type: "PDF" }
+                    ]
+                },
                 traceability: [
                     { 
                         step: { zh: "原料採集", en: "Material Collection" }, 
@@ -341,6 +369,13 @@
                     color: { zh: "米白", en: "Off-White" }, 
                     size: { zh: "L", en: "L" }, 
                     batch: { zh: "2024-JAN-Batch", en: "2024-JAN-Batch" } 
+                },
+                circularity: {
+                    repairability: { score: 9.8, grade: "A", label: { zh: "易於縫補", en: "Easy to Stitch" } },
+                    carbonFootprint: { value: "3.5 kg CO2e", label: { zh: "每件", en: "per item" } },
+                    documents: [
+                        { title: { zh: "有機棉認證書", en: "Organic Certification" }, type: "PDF" }
+                    ]
                 },
                 traceability: [
                     { 
@@ -750,7 +785,7 @@
                     <div className="px-4 -mt-4 relative z-10">
                         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-h-[50vh]">
                             <div className="flex border-b border-gray-100">
-                                {['traceability', 'materials', 'info'].map(tab => (
+                                {['traceability', 'materials', 'circularity', 'info'].map(tab => (
                                     <button 
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
@@ -759,11 +794,22 @@
                                     >
                                         {tab === 'traceability' && <Globe className="w-4 h-4" />}
                                         {tab === 'materials' && <Recycle className="w-4 h-4" />}
+                                        {tab === 'circularity' && <Leaf className="w-4 h-4" />}
                                         {tab === 'info' && <Info className="w-4 h-4" />}
-                                        <span className="capitalize">
-                                            {tab === 'traceability' ? t.tabTraceability : tab === 'materials' ? t.tabMaterials : t.tabInfo}
+                                        <span className="capitalize hidden sm:inline">
+                                            {tab === 'traceability' ? t.tabTraceability.split(' ')[0] : 
+                                             tab === 'materials' ? t.tabMaterials : 
+                                             tab === 'circularity' ? t.tabCircular :
+                                             t.tabInfo}
                                         </span>
-                                        {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600 rounded-t-full mx-4" />}
+                                        {/* Mobile simplified label */}
+                                        <span className="capitalize sm:hidden">
+                                            {tab === 'traceability' ? '旅程' : 
+                                             tab === 'materials' ? '材質' : 
+                                             tab === 'circularity' ? '循環' :
+                                             '資訊'}
+                                        </span>
+                                        {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600 rounded-t-full mx-2 sm:mx-4" />}
                                     </button>
                                 ))}
                             </div>
@@ -838,6 +884,60 @@
                                                 <Recycle className="w-4 h-4" /> {t.recyclingInst}
                                             </h4>
                                             <p className="text-sm text-blue-800/80 leading-relaxed">{product.disposal[lang]}</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab === 'circularity' && product.circularity && (
+                                    <div className="space-y-6 animate-fadeIn">
+                                        <h3 className="font-bold text-gray-800 text-lg mb-4">{t.tabCircular} & {t.specsTitle.split(' ')[0]}</h3>
+                                        
+                                        {/* Repairability Score Card */}
+                                        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm relative overflow-hidden">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">{t.repairScore}</p>
+                                                    <h4 className="text-2xl font-bold text-gray-800">{product.circularity.repairability.score} <span className="text-sm text-gray-400 font-normal">/ 10</span></h4>
+                                                    <p className="text-sm text-gray-600 mt-1">{product.circularity.repairability.label[lang]}</p>
+                                                </div>
+                                                <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold text-white 
+                                                    ${product.circularity.repairability.grade === 'A' ? 'bg-green-500' : 
+                                                      product.circularity.repairability.grade === 'B' ? 'bg-lime-500' : 'bg-yellow-500'}`}>
+                                                    {product.circularity.repairability.grade}
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                                <div className="h-full bg-gradient-to-r from-red-400 via-yellow-400 to-green-500" style={{width: `${product.circularity.repairability.score * 10}%`}}></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Carbon Footprint Card */}
+                                        <div className="bg-emerald-50 rounded-xl border border-emerald-100 p-5 flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs text-emerald-600 font-bold uppercase tracking-wider mb-1">{t.carbonFootprint}</p>
+                                                <h4 className="text-2xl font-bold text-emerald-900">{product.circularity.carbonFootprint.value}</h4>
+                                                <p className="text-xs text-emerald-700 mt-1 opacity-80">{product.circularity.carbonFootprint.label[lang]}</p>
+                                            </div>
+                                            <div className="bg-white p-3 rounded-full shadow-sm">
+                                                <Leaf className="w-6 h-6 text-emerald-500" />
+                                            </div>
+                                        </div>
+
+                                        {/* Documentation List */}
+                                        <div>
+                                            <h4 className="font-bold text-gray-700 mb-3 text-sm flex items-center gap-2">
+                                                <FileText className="w-4 h-4" /> {t.documents}
+                                            </h4>
+                                            <div className="space-y-2">
+                                                {product.circularity.documents.map((doc, idx) => (
+                                                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-100 cursor-pointer group">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-white p-2 rounded border border-gray-200 text-xs font-bold text-gray-500">{doc.type}</div>
+                                                            <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{doc.title[lang]}</span>
+                                                        </div>
+                                                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
