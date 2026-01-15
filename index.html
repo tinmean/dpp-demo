@@ -52,11 +52,11 @@
                 notFoundDesc: "系統資料庫中找不到 GTIN 編號：",
                 backHome: "返回首頁",
                 verifiedPassport: "已驗證護照",
-                tabTraceability: "旅程",
+                tabTraceability: "旅程 (UNTP)",
                 tabMaterials: "材質",
                 tabInfo: "資訊",
-                footprintTitle: "產品足跡",
-                footprintBadge: "全供應鏈追溯",
+                footprintTitle: "供應鏈事件追溯",
+                footprintBadge: "符合 UNTP/EPCIS 標準",
                 materialComp: "材質組成",
                 recyclingInst: "回收指示",
                 specsTitle: "產品規格",
@@ -93,6 +93,12 @@
                 logGrsCheck: "驗證 GRS 規範符合性...",
                 logGrsValid: "Schema: GRS 4.0 已驗證",
                 logComplete: "驗證流程結束。",
+                serialLabel: "產品序號 (Serial)",
+                batchLabel: "生產批號 (Batch)",
+                untpGln: "GLN 位置碼",
+                untpEvent: "事件類型",
+                untpBizStep: "業務步驟",
+                untpVerify: "事件已上鏈驗證",
                 specKeys: {
                     color: "顏色/外觀",
                     size: "尺寸/規格",
@@ -112,11 +118,11 @@
                 notFoundDesc: "GTIN not found in the system database:",
                 backHome: "Back to Home",
                 verifiedPassport: "Verified Passport",
-                tabTraceability: "Journey",
+                tabTraceability: "Journey (UNTP)",
                 tabMaterials: "Materials",
                 tabInfo: "Info",
-                footprintTitle: "Product Footprint",
-                footprintBadge: "Full Traceability",
+                footprintTitle: "Supply Chain Events",
+                footprintBadge: "UNTP/EPCIS Compliant",
                 materialComp: "Material Composition",
                 recyclingInst: "Recycling Instructions",
                 specsTitle: "Product Specifications",
@@ -153,6 +159,12 @@
                 logGrsCheck: "Validating GRS Schema Compliance...",
                 logGrsValid: "Schema: GRS 4.0 Verified",
                 logComplete: "Verification Process Complete.",
+                serialLabel: "Serial Number (21)",
+                batchLabel: "Batch/Lot (10)",
+                untpGln: "GLN (Location)",
+                untpEvent: "Event Type",
+                untpBizStep: "BizStep",
+                untpVerify: "Event Verified On-Chain",
                 specKeys: {
                     color: "Color",
                     size: "Size",
@@ -183,9 +195,11 @@
         const Loader = (p) => <IconBase {...p} className={`${p.className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const Building = (p) => <IconBase {...p}><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></IconBase>;
         const Languages = (p) => <IconBase {...p}><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></IconBase>;
+        const Hash = (p) => <IconBase {...p}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></IconBase>;
+        const Link = (p) => <IconBase {...p}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></IconBase>;
 
 
-        // --- 產品資料庫 (支援雙語結構) ---
+        // --- 產品資料庫 (支援雙語結構 + UNTP Event Traceability) ---
         const PRODUCT_DATABASE = {
             "09876543210999": {
                 name: { zh: "EcoSound 再生吸音板", en: "EcoSound Recycled Acoustic Panel" },
@@ -203,10 +217,35 @@
                     nrc: { zh: "0.85 (吸音係數)", en: "0.85 (NRC)" },
                     ceMark: { zh: "Yes (EN 15102)", en: "Yes (EN 15102)" }
                 },
+                // Updated with UNTP/EPCIS fields: GLN, Event Type, BizStep
                 traceability: [
-                    { step: { zh: "PET 瓶磚回收", en: "PET Bottle Bale Recycling" }, location: { zh: "德國, 柏林", en: "Berlin, Germany" }, date: "2023-11-05", icon: Recycle },
-                    { step: { zh: "纖維抽絲加工", en: "Fiber Extrusion" }, location: { zh: "波蘭, 羅茲", en: "Lodz, Poland" }, date: "2023-11-20", icon: Package },
-                    { step: { zh: "熱壓成型與裁切", en: "Thermoforming & Cutting" }, location: { zh: "捷克, 布拉格", en: "Prague, Czechia" }, date: "2023-12-01", icon: Building },
+                    { 
+                        step: { zh: "PET 瓶磚回收", en: "PET Bottle Bale Recycling" }, 
+                        location: { zh: "德國, 柏林", en: "Berlin, Germany" }, 
+                        date: "2023-11-05", 
+                        icon: Recycle,
+                        gln: "4012345000009", // GLN for facility
+                        type: "ObjectEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:collecting"
+                    },
+                    { 
+                        step: { zh: "纖維抽絲加工", en: "Fiber Extrusion" }, 
+                        location: { zh: "波蘭, 羅茲", en: "Lodz, Poland" }, 
+                        date: "2023-11-20", 
+                        icon: Package,
+                        gln: "5901234000012",
+                        type: "TransformationEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:transforming" 
+                    },
+                    { 
+                        step: { zh: "熱壓成型與裁切", en: "Thermoforming & Cutting" }, 
+                        location: { zh: "捷克, 布拉格", en: "Prague, Czechia" }, 
+                        date: "2023-12-01", 
+                        icon: Building,
+                        gln: "8591234000023",
+                        type: "TransformationEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:manufacturing"
+                    },
                 ],
                 materials: [
                     { name: { zh: "rPET (再生聚酯纖維)", en: "rPET (Recycled Polyester)" }, percentage: 100 },
@@ -247,9 +286,33 @@
                     batch: { zh: "2024-Q1-TW", en: "2024-Q1-TW" } 
                 },
                 traceability: [
-                    { step: { zh: "原料採集", en: "Material Collection" }, location: { zh: "台灣, 澎湖", en: "Penghu, Taiwan" }, date: "2023-10-01", icon: Recycle },
-                    { step: { zh: "紡織加工", en: "Textile Processing" }, location: { zh: "台灣, 彰化", en: "Changhua, Taiwan" }, date: "2023-11-15", icon: Package },
-                    { step: { zh: "最終組裝", en: "Final Assembly" }, location: { zh: "越南, 胡志明", en: "Ho Chi Minh City, Vietnam" }, date: "2024-01-20", icon: CheckCircle },
+                    { 
+                        step: { zh: "原料採集", en: "Material Collection" }, 
+                        location: { zh: "台灣, 澎湖", en: "Penghu, Taiwan" }, 
+                        date: "2023-10-01", 
+                        icon: Recycle,
+                        gln: "4710001000001",
+                        type: "ObjectEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:collecting"
+                    },
+                    { 
+                        step: { zh: "紡織加工", en: "Textile Processing" }, 
+                        location: { zh: "台灣, 彰化", en: "Changhua, Taiwan" }, 
+                        date: "2023-11-15", 
+                        icon: Package,
+                        gln: "4710001000025",
+                        type: "TransformationEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:transforming"
+                    },
+                    { 
+                        step: { zh: "最終組裝", en: "Final Assembly" }, 
+                        location: { zh: "越南, 胡志明", en: "Ho Chi Minh City, Vietnam" }, 
+                        date: "2024-01-20", 
+                        icon: CheckCircle,
+                        gln: "8930001000033",
+                        type: "AggregationEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:assembling"
+                    },
                 ],
                 materials: [
                     { name: { zh: "回收 PET", en: "Recycled PET" }, percentage: 80 }, 
@@ -280,9 +343,33 @@
                     batch: { zh: "2024-JAN-Batch", en: "2024-JAN-Batch" } 
                 },
                 traceability: [
-                    { step: { zh: "棉花種植", en: "Cotton Farming" }, location: { zh: "土耳其, 伊茲密爾", en: "Izmir, Turkey" }, date: "2023-08-01", icon: MapPin },
-                    { step: { zh: "紡紗織布", en: "Spinning & Weaving" }, location: { zh: "葡萄牙, 波爾圖", en: "Porto, Portugal" }, date: "2023-09-20", icon: Package },
-                    { step: { zh: "品檢包裝", en: "QC & Packaging" }, location: { zh: "德國, 漢堡", en: "Hamburg, Germany" }, date: "2023-10-10", icon: CheckCircle },
+                    { 
+                        step: { zh: "棉花種植", en: "Cotton Farming" }, 
+                        location: { zh: "土耳其, 伊茲密爾", en: "Izmir, Turkey" }, 
+                        date: "2023-08-01", 
+                        icon: MapPin,
+                        gln: "8690001000008",
+                        type: "ObjectEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:farming"
+                    },
+                    { 
+                        step: { zh: "紡紗織布", en: "Spinning & Weaving" }, 
+                        location: { zh: "葡萄牙, 波爾圖", en: "Porto, Portugal" }, 
+                        date: "2023-09-20", 
+                        icon: Package,
+                        gln: "5600001000004",
+                        type: "TransformationEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:transforming"
+                    },
+                    { 
+                        step: { zh: "品檢包裝", en: "QC & Packaging" }, 
+                        location: { zh: "德國, 漢堡", en: "Hamburg, Germany" }, 
+                        date: "2023-10-10", 
+                        icon: CheckCircle,
+                        gln: "4000001000009",
+                        type: "ObjectEvent",
+                        bizStep: "urn:epcglobal:cbv:bizstep:packing"
+                    },
                 ],
                 materials: [
                     { name: { zh: "有機棉", en: "Organic Cotton" }, percentage: 100 }
@@ -563,8 +650,10 @@
 
                         <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-8 text-left">
                             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{t.formatTitle}</p>
-                            <p className="text-xs font-mono text-gray-600 break-all select-all">
-                            https://dpp-demo.sdpp.tw/#/01/<span className="text-green-600">{'{GTIN}'}</span>
+                            <p className="text-xs font-mono text-gray-600 break-all select-all leading-relaxed">
+                            https://dpp-demo.sdpp.tw/#/01/<span className="text-green-600">{'{GTIN}'}</span><br/>
+                            <span className="text-gray-400">/10/<span className="text-blue-500">{'{Batch}'}</span></span>
+                            <span className="text-gray-400">/21/<span className="text-purple-500">{'{Serial}'}</span></span>
                             </p>
                         </div>
                         
@@ -584,6 +673,22 @@
                                         <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-green-500" />
                                     </button>
                                 ))}
+                                {/* 範例：帶有批號與序號的模擬連結 */}
+                                <button 
+                                    onClick={() => {
+                                        // 模擬跳轉到帶有 10 和 21 的網址
+                                        window.location.hash = `/01/09876543210999/10/BATCH-999/21/SN-88888`;
+                                    }}
+                                    className="w-full py-3 px-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 hover:text-blue-800 transition flex items-center justify-between group"
+                                >
+                                    <div className="text-left">
+                                        <span className="block font-medium text-sm text-blue-900 group-hover:text-blue-800 flex items-center gap-1">
+                                            <Hash className="w-3 h-3" /> 模擬: 帶入批號 (10) 與序號 (21)
+                                        </span>
+                                        <span className="block text-xs text-blue-400 font-mono mt-0.5">/10/BATCH-999/21/SN-88888</span>
+                                    </div>
+                                    <ArrowRight className="w-4 h-4 text-blue-300 group-hover:text-blue-500" />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -595,7 +700,7 @@
         };
 
         // --- 組件: 產品詳情頁 ---
-        const PassportPage = ({ product, gtin, onBack, lang, setLang }) => {
+        const PassportPage = ({ product, urlData, onBack, lang, setLang }) => {
             const [activeTab, setActiveTab] = useState('traceability');
             const [isCredentialOpen, setIsCredentialOpen] = useState(false);
             const t = TRANSLATIONS[lang];
@@ -608,7 +713,7 @@
                             <X className="w-8 h-8 text-red-500" />
                         </div>
                         <h2 className="text-xl font-bold text-gray-800">{t.notFoundTitle}</h2>
-                        <p className="text-gray-600 mt-2 text-sm">{t.notFoundDesc}<br/><span className="font-mono bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{gtin}</span></p>
+                        <p className="text-gray-600 mt-2 text-sm">{t.notFoundDesc}<br/><span className="font-mono bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{urlData.gtin}</span></p>
                         <button onClick={onBack} className="mt-6 w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition font-medium">{t.backHome}</button>
                     </div>
                 </div>
@@ -678,10 +783,32 @@
                                                             <step.icon className="w-4 h-4 text-green-600" />
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <span className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 block">{step.step[lang]}</span>
-                                                        <p className="text-gray-900 font-bold text-base">{step.location[lang]}</p>
-                                                        <p className="text-sm text-gray-400 mt-1 font-mono">{step.date}</p>
+                                                    <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{step.step[lang]}</span>
+                                                            <span className="text-xs text-gray-400 font-mono">{step.date}</span>
+                                                        </div>
+                                                        <p className="text-gray-900 font-bold text-base mb-3">{step.location[lang]}</p>
+                                                        
+                                                        {/* UNTP Event Data Display */}
+                                                        <div className="bg-slate-50 rounded border border-slate-100 p-2 text-xs space-y-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-slate-400 font-semibold">{t.untpGln}:</span>
+                                                                <span className="font-mono text-slate-600">{step.gln}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-slate-400 font-semibold">{t.untpEvent}:</span>
+                                                                <span className="font-mono text-slate-600 bg-slate-200 px-1 rounded">{step.type}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-slate-400 font-semibold">{t.untpBizStep}:</span>
+                                                            </div>
+                                                            <div className="font-mono text-[10px] text-slate-500 break-all pl-1">{step.bizStep}</div>
+                                                            
+                                                            <div className="pt-1 mt-1 border-t border-slate-100 flex items-center gap-1 text-green-600 font-bold">
+                                                                <Link className="w-3 h-3" /> {t.untpVerify}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
@@ -718,20 +845,36 @@
                                     <div className="space-y-6 animate-fadeIn">
                                         <h3 className="font-bold text-gray-800 text-lg">{t.specsTitle}</h3>
                                         <div className="grid grid-cols-2 gap-3">
-                                            {/* 動態渲染規格 */}
-                                            {Object.entries(product.specs).map(([key, value]) => (
-                                                <div key={key} className={`p-4 bg-gray-50 rounded-xl border border-gray-100 ${key === 'batch' || key === 'ceMark' ? 'col-span-2' : ''}`}>
-                                                    <span className="text-xs text-gray-400 block mb-1 capitalize">
-                                                        {t.specKeys[key] || key}
-                                                    </span>
-                                                    <span className="text-sm font-semibold text-gray-800">{value[lang]}</span>
-                                                </div>
-                                            ))}
+                                            {/* 動態渲染規格 - 如果網址有批號 (10) 則優先顯示，否則顯示資料庫的 */}
+                                            {Object.entries(product.specs).map(([key, value]) => {
+                                                let displayValue = value[lang];
+                                                if (key === 'batch' && urlData.batch) {
+                                                    displayValue = urlData.batch; // 來自網址的批號
+                                                }
+                                                return (
+                                                    <div key={key} className={`p-4 bg-gray-50 rounded-xl border border-gray-100 ${key === 'batch' || key === 'ceMark' ? 'col-span-2' : ''}`}>
+                                                        <span className="text-xs text-gray-400 block mb-1 capitalize">
+                                                            {t.specKeys[key] || key}
+                                                        </span>
+                                                        <span className={`text-sm font-semibold text-gray-800 ${key === 'batch' && urlData.batch ? 'text-blue-600' : ''}`}>
+                                                            {displayValue}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
                                             
                                             <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 col-span-2">
                                                 <span className="text-xs text-gray-400 block mb-1">{t.gtinLabel}</span>
-                                                <span className="text-sm font-semibold text-gray-800 font-mono tracking-wide">{gtin}</span>
+                                                <span className="text-sm font-semibold text-gray-800 font-mono tracking-wide">{urlData.gtin}</span>
                                             </div>
+
+                                            {/* 顯示序號 (21) - 如果網址有提供 */}
+                                            {urlData.serial && (
+                                                <div className="p-4 bg-purple-50 rounded-xl border border-purple-100 col-span-2">
+                                                    <span className="text-xs text-purple-600 block mb-1 font-bold">{t.serialLabel}</span>
+                                                    <span className="text-sm font-semibold text-purple-900 font-mono tracking-wide">{urlData.serial}</span>
+                                                </div>
+                                            )}
                                         </div>
                                         
                                         {/* 觸發 VC Modal 的按鈕區塊 */}
@@ -758,23 +901,35 @@
 
         // --- 主程式 ---
         const App = () => {
-            const [currentGtin, setCurrentGtin] = useState(null);
+            const [urlData, setUrlData] = useState({ gtin: null, batch: null, serial: null });
             const [lang, setLang] = useState('zh'); // 預設語言: 中文
 
-            const getGtinFromHash = () => {
+            const parseHash = () => {
                 const hash = window.location.hash; 
-                if (!hash) return null;
+                if (!hash) return { gtin: null };
+
                 const parts = hash.split('/');
-                const identifierIndex = parts.indexOf('01');
-                if (identifierIndex !== -1 && parts[identifierIndex + 1]) {
-                    return parts[identifierIndex + 1];
-                }
-                return null;
+                const result = { gtin: null, batch: null, serial: null };
+
+                // 簡單解析器：尋找 AI (01, 10, 21) 後面的值
+                const findValue = (ai) => {
+                    const index = parts.indexOf(ai);
+                    if (index !== -1 && parts[index + 1]) {
+                        return parts[index + 1];
+                    }
+                    return null;
+                };
+
+                result.gtin = findValue('01');
+                result.batch = findValue('10');
+                result.serial = findValue('21');
+
+                return result;
             };
 
             useEffect(() => {
-                setCurrentGtin(getGtinFromHash());
-                const handleHashChange = () => setCurrentGtin(getGtinFromHash());
+                setUrlData(parseHash());
+                const handleHashChange = () => setUrlData(parseHash());
                 window.addEventListener('hashchange', handleHashChange);
                 return () => window.removeEventListener('hashchange', handleHashChange);
             }, []);
@@ -787,9 +942,9 @@
                 window.location.hash = '';
             };
 
-            if (currentGtin) {
-                const product = PRODUCT_DATABASE[currentGtin];
-                return <PassportPage product={product} gtin={currentGtin} onBack={navigateHome} lang={lang} setLang={setLang} />;
+            if (urlData.gtin) {
+                const product = PRODUCT_DATABASE[urlData.gtin];
+                return <PassportPage product={product} urlData={urlData} onBack={navigateHome} lang={lang} setLang={setLang} />;
             }
             return <LandingPage onScan={navigateToProduct} lang={lang} setLang={setLang} />;
         };
