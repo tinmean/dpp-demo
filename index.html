@@ -278,7 +278,7 @@
                     "issuer": "did:web:cert.controlunion.com",
                     "issuanceDate": "2024-01-15T09:00:00Z",
                     "credentialSubject": {
-                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210999",
+                        "id": "did:web:github-pages.example:product:09876543210999",
                         "gtin": "09876543210999",
                         "grsCertification": {
                             "standard": "Global Recycled Standard (GRS) 4.0",
@@ -353,7 +353,7 @@
                     "issuer": "did:web:issuer.greenwalk.com",
                     "issuanceDate": "2023-11-20T19:23:24Z",
                     "credentialSubject": {
-                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210123",
+                        "id": "did:web:github-pages.example:product:09876543210123",
                         "gtin": "09876543210123",
                         "claim": { "recycledContent": "80%", "carbonNeutral": true }
                     },
@@ -416,7 +416,7 @@
                     "issuer": "did:web:cert.global-organic.org",
                     "issuanceDate": "2023-09-15T10:00:00Z",
                     "credentialSubject": {
-                        "id": "did:web:dpp-demo.sdpp.tw:product:09876543210456",
+                        "id": "did:web:github-pages.example:product:09876543210456",
                         "gtin": "09876543210456",
                         "certificationLevel": "GOTS Certified"
                     }
@@ -686,7 +686,7 @@
                         <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-8 text-left">
                             <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{t.formatTitle}</p>
                             <p className="text-xs font-mono text-gray-600 break-all select-all leading-relaxed">
-                            https://dpp-demo.sdpp.tw/#/01/<span className="text-green-600">{'{GTIN}'}</span><br/>
+                            {window.location.origin + window.location.pathname}#/01/<span className="text-green-600">{'{GTIN}'}</span><br/>
                             <span className="text-gray-400">/10/<span className="text-blue-500">{'{Batch}'}</span></span>
                             <span className="text-gray-400">/21/<span className="text-purple-500">{'{Serial}'}</span></span>
                             </p>
@@ -728,7 +728,7 @@
                         </div>
                     </div>
                     <div className="mt-8 text-xs text-gray-400 flex items-center justify-center gap-1">
-                        {t.poweredBy} <span className="font-semibold text-gray-500">dpp-demo.sdpp.tw</span>
+                        {t.poweredBy} <span className="font-semibold text-gray-500">{window.location.host || 'GitHub Pages'}</span>
                     </div>
                 </div>
             );
